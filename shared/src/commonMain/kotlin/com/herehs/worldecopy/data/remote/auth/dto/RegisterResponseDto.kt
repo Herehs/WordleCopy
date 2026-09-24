@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterResponseDto(
-    @SerialName("access_token") val accessToken: String,
-    @SerialName("refresh_token") val refreshToken: String,
-    @SerialName("token_type") val tokenType: String
+    @SerialName("id") val id: Int,
+    @SerialName("username") val username: String,
+    @SerialName("total_points") val points: Int
 )

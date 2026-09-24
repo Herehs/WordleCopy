@@ -29,7 +29,8 @@ class AuthRepositoryImpl(
         username: String,
         password: String
     ): Flow<Resource<Unit>> = safeApiCall {
-        val response = api.register(username = username, password = password)
+        api.register(username = username, password = password)
+        val response = api.login(username = username, password = password)
         tokenStorage.save(
             WebToken(
                 access = response.accessToken,
