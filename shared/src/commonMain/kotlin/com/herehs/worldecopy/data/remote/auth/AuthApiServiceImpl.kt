@@ -30,7 +30,7 @@ class AuthApiServiceImpl(
     ): RegisterResponseDto {
         val response = client.post("/api/players/register") {
             setBody(
-                LoginRequestDto(
+                RegisterRequestDto(
                     username = username,
                     password = password
                 )
@@ -47,7 +47,7 @@ class AuthApiServiceImpl(
     ): LoginResponseDto {
         val response = client.post("/api/players/login") {
             setBody(
-                RegisterRequestDto(
+                LoginRequestDto(
                     username = username,
                     password = password
                 )

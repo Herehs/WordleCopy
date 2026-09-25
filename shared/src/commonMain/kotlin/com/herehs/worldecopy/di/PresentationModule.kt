@@ -1,5 +1,6 @@
 package com.herehs.worldecopy.di
 
+import com.herehs.worldecopy.AppViewModel
 import com.herehs.worldecopy.presentation.screens.authorisation.AuthorisationViewModel
 import com.herehs.worldecopy.presentation.screens.leaderboard.LeaderBoardViewModel
 import com.herehs.worldecopy.presentation.screens.main.MainScreenViewModel
@@ -12,4 +13,5 @@ val presentationModule = module {
     viewModel<AuthorisationViewModel>()
     viewModel<MainScreenViewModel>()
     viewModel<LeaderBoardViewModel>()
+    viewModel<AppViewModel>()
 }

@@ -48,22 +48,11 @@ fun LeaderBoardRoute(
     viewModel: LeaderBoardViewModel = koinViewModel()
 ){
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit){
-        viewModel.events.collect { event ->
-            when(event){
-                is LeaderBoardViewModel.AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
-                else -> {}
-            }
-        }
-    }
 
     LeaderboardScreen(
         modifier = modifier,
         toMainScreen = toMainScreen,
-        state = state,
-        snackbarHostState = snackbarHostState
+        state = state
     )
 }
 
@@ -72,7 +61,6 @@ fun LeaderboardScreen(
     modifier: Modifier = Modifier,
     state: LeaderBoardUiState = LeaderBoardUiState(),
     toMainScreen: () -> Unit = {},
-    snackbarHostState: SnackbarHostState
 ){
 
     Box(
@@ -115,41 +103,38 @@ fun LeaderboardScreen(
                 }
             }
         }
-
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .clip(
-                    shape = RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .clip(
+                        shape = RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp
+                        )
                     )
-                )
-                .background(
-                    color = MaterialTheme.colorScheme.surface
-                )
-                .fillMaxWidth(),
-        ){
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .imePadding()
-                    .padding(16.dp)
-            )
+                    .background(
+                        color = MaterialTheme.colorScheme.surface
+                    )
+                    .fillMaxWidth(),
+            ){
 
-            RoundedButton(
-                modifier = Modifier
-                    .padding(10.dp),
-                contentAlignment = Alignment.Center,
-                color = MaterialTheme.colorScheme.tertiary,
-                onClick = toMainScreen
-            ) {
-                Text(
-                    text = stringResource(Res.string.start_game),
-                    fontSize = 18.sp,
-                    fontFamily = golosFontFamily(),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                RoundedButton(
+                    modifier = Modifier
+                        .padding(10.dp),
+                    contentAlignment = Alignment.Center,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    onClick = toMainScreen
+                ) {
+                    Text(
+                        text = stringResource(Res.string.start_game),
+                        fontSize = 18.sp,
+                        fontFamily = golosFontFamily(),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }

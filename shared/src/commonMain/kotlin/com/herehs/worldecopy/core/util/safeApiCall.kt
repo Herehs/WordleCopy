@@ -6,6 +6,7 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.io.EOFException
@@ -31,6 +32,8 @@ fun <T> safeApiCall(call: suspend () -> T): Flow<Resource<T>> = flow {
         emit(Resource.Error("Сервер закрыл соединение: ${e.message}"))
     } catch (e: IOException) {
         emit(Resource.Error("Проблема с сетью"))
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         emit(Resource.Error(e.message ?: "Неизвестная ошибка"))
     }

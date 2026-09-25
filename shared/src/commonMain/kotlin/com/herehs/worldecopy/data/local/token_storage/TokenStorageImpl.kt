@@ -41,8 +41,7 @@ class TokenStorageImpl(
 
     override suspend fun clear(){
         dataStore.edit { preferences ->
-            preferences.remove(refresh)
-            preferences.remove(access)
+            preferences.clear()
         }
     }
 }

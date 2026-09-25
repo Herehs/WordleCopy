@@ -8,10 +8,12 @@ import com.herehs.worldecopy.data.remote.game.GameApiService
 import com.herehs.worldecopy.data.remote.game.GameApiServiceImpl
 import com.herehs.worldecopy.data.repository.AuthRepositoryImpl
 import com.herehs.worldecopy.data.repository.GameRepositoryImpl
+import com.herehs.worldecopy.data.repository.TokenRepositoryImpl
 import com.herehs.worldecopy.data.util.createApiClient
 import com.herehs.worldecopy.data.util.createRefreshClient
 import com.herehs.worldecopy.domain.repository.AuthRepository
 import com.herehs.worldecopy.domain.repository.GameRepository
+import com.herehs.worldecopy.domain.repository.TokenRepository
 import io.ktor.client.HttpClient
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.named
@@ -54,6 +56,10 @@ val dataModule = module {
 
     single<GameRepository> {
         GameRepositoryImpl(get())
+    }
+
+    single<TokenRepository> {
+        TokenRepositoryImpl(get())
     }
 }
 

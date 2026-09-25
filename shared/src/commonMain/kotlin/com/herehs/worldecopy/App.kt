@@ -10,8 +10,13 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -25,76 +30,100 @@ import com.herehs.worldecopy.presentation.screens.registration.RegistrationScree
 import com.herehs.worldecopy.presentation.theme.AppTheme
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 @Preview
 fun App() {
     AppTheme {
-        val backStack = rememberNavBackStack(navConfig, Screen.Registration)
+        val appViewModel: AppViewModel = koinViewModel()
+        val authState by appViewModel.authState.collectAsStateWithLifecycle()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background)
         )
-        NavDisplay(
-            backStack = backStack,
-            onBack = { backStack.removeLastOrNull() },
-            entryProvider = entryProvider {
-                entry<Screen.Registration> {
-                    RegistrationScreenRoute(
-                        modifier = Modifier.systemBarsPadding(),
-                        onSignUpClick = {
-                            backStack.add(Screen.Leaderboard)
-                            backStack.removeAll {
-                                it != Screen.Leaderboard
-                            }
-                        },
-                        onHaveAccountClick = {
-                            backStack.add(Screen.Authorisation)
-                            backStack.removeAll {
-                                it != Screen.Authorisation
-                            }
-                        }
-                    )
-                }
-                entry<Screen.Authorisation> {
-                    AuthorisationScreenRoute(
-                        modifier = Modifier.systemBarsPadding(),
-                        onSignInClick = {
-                            backStack.add(Screen.Leaderboard)
-                            backStack.removeAll {
-                                it != Screen.Leaderboard
-                            }
-                        },
-                        onDontHaveAccountClick = {
-                            backStack.add(Screen.Registration)
-                            backStack.removeAll {
-                                it != Screen.Registration
-                            }
-                        }
-                    )
-                }
-                entry<Screen.Leaderboard> {
-                    LeaderBoardRoute(
-                        modifier = Modifier.systemBarsPadding(),
-                        toMainScreen = {
-                            backStack.add(Screen.Main)
 
-                        }
-                    )
-                }
-                entry<Screen.Main> {
-                    MainScreenRoute(
-                        modifier = Modifier.systemBarsPadding(),
-                        toLeaderBoard = {
-                            backStack.add(Screen.Leaderboard)
-                        }
-                    )
-                }
+        when(authState) {
+            AuthState.Authenticated -> {
+                NavRoot(Screen.Leaderboard)
             }
-        )
+            AuthState.Loading -> {
+
+            }
+            AuthState.Unauthenticated -> {
+                NavRoot(Screen.Registration)
+            }
+        }
     }
+}
+
+@Composable
+fun NavRoot(
+    startScreen: Screen
+){
+    val backStack = rememberNavBackStack(navConfig, startScreen)
+
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            entry<Screen.Registration> {
+                RegistrationScreenRoute(
+                    modifier = Modifier.systemBarsPadding(),
+                    onSignUpClick = {
+                        backStack.add(Screen.Leaderboard)
+                        backStack.removeAll {
+                            it != Screen.Leaderboard
+                        }
+                    },
+                    onHaveAccountClick = {
+                        backStack.add(Screen.Authorisation)
+                        backStack.removeAll {
+                            it != Screen.Authorisation
+                        }
+                    }
+                )
+            }
+            entry<Screen.Authorisation> {
+                AuthorisationScreenRoute(
+                    modifier = Modifier.systemBarsPadding(),
+                    onSignInClick = {
+                        backStack.add(Screen.Leaderboard)
+                        backStack.removeAll {
+                            it != Screen.Leaderboard
+                        }
+                    },
+                    onDontHaveAccountClick = {
+                        backStack.add(Screen.Registration)
+                        backStack.removeAll {
+                            it != Screen.Registration
+                        }
+                    }
+                )
+            }
+            entry<Screen.Leaderboard> {
+                LeaderBoardRoute(
+                    modifier = Modifier.systemBarsPadding(),
+                    toMainScreen = {
+                        backStack.add(Screen.Main)
+
+                    }
+                )
+            }
+            entry<Screen.Main> {
+                MainScreenRoute(
+                    modifier = Modifier.systemBarsPadding(),
+                    toLeaderBoard = {
+                        backStack.add(Screen.Leaderboard)
+                    }
+                )
+            }
+        }
+    )
+
 }
 
 private val navConfig = SavedStateConfiguration {
