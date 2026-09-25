@@ -1,10 +1,14 @@
 package com.herehs.worldecopy.presentation.screens.main
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,14 +39,20 @@ fun MainScreenRoute(
     toLeaderBoard: () -> Unit = {}
 ){
     val state by viewModel.screenState.collectAsState()
-    MainScreen(
-        modifier = modifier,
-        onButtonClick = viewModel::onLetterInput,
-        onClearClick = viewModel::onBackspace,
-        onSubmitClick = viewModel::onSubmit,
-        toLeaderBoard = toLeaderBoard,
-        state = state
-    )
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Top
+    ){
+        MainScreen(
+            modifier = Modifier,
+            onButtonClick = viewModel::onLetterInput,
+            onClearClick = viewModel::onBackspace,
+            onSubmitClick = viewModel::onSubmit,
+            toLeaderBoard = toLeaderBoard,
+            state = state
+        )
+    }
 }
 @Composable
 fun MainScreen(
@@ -55,6 +65,8 @@ fun MainScreen(
 ){
     Column(
         modifier = modifier
+            .widthIn(max = 411.dp),
+        verticalArrangement = Arrangement.Top
     ) {
         RoundedButton(
             modifier = Modifier
@@ -66,7 +78,8 @@ fun MainScreen(
         ){
             Icon(
                 painter = painterResource(Res.drawable.arrow_back_up),
-                contentDescription = ""
+                contentDescription = "",
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
         WordGrid(

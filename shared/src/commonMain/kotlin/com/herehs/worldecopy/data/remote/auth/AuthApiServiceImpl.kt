@@ -44,14 +44,16 @@ class AuthApiServiceImpl(
         username: String,
         password: String
     ): LoginResponseDto {
-        return client.post("/api/players/login") {
+        val response = client.post("/api/players/login") {
             setBody(
                 RegisterRequestDto(
                     username = username,
                     password = password
                 )
             )
-        }.body()
+        }
+        response.throwIfError()
+        return response.body<LoginResponseDto>()
     }
 
     private suspend fun HttpResponse.throwIfError() {

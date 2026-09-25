@@ -1,7 +1,5 @@
 package com.herehs.worldecopy.presentation.screens.authorisation
 
-import com.herehs.worldecopy.presentation.screens.registration.RegistrationUiState
-import com.herehs.worldecopy.presentation.screens.registration.RegistrationViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,13 +11,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -27,17 +31,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.herehs.worldecopy.Res
-import com.herehs.worldecopy.already_have_account
 import com.herehs.worldecopy.authorisation
 import com.herehs.worldecopy.dont_have_account
 import com.herehs.worldecopy.login
+import com.herehs.worldecopy.login_placeholder
 import com.herehs.worldecopy.password
+import com.herehs.worldecopy.password_placeholder
 import com.herehs.worldecopy.presentation.components.RoundedButton
 import com.herehs.worldecopy.presentation.components.RoundedTextField
+import com.herehs.worldecopy.presentation.screens.registration.RegistrationViewModel
 import com.herehs.worldecopy.presentation.theme.AppTheme
 import com.herehs.worldecopy.presentation.theme.golosFontFamily
-import com.herehs.worldecopy.registration
-import com.herehs.worldecopy.scary_smile
 import com.herehs.worldecopy.sign_in
 import com.herehs.worldecopy.sign_up
 import com.herehs.worldecopy.thougthful_smile
@@ -49,17 +53,28 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AuthorisationScreenRoute(
     modifier: Modifier = Modifier,
     viewModel: AuthorisationViewModel = koinViewModel(),
-    onHaveAccountClick: () -> Unit,
-    onSingInClick: () -> Unit = { }
+    onDontHaveAccountClick: () -> Unit,
+    onSignInClick: () -> Unit = { }
 ){
     val state by viewModel.screenState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit){
+        viewModel.events.collect { event ->
+            when(event){
+                is AuthorisationViewModel.AuthEvent.NavigateToHome -> onSignInClick()
+                is AuthorisationViewModel.AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
+    }
     AuthorisationScreen(
         modifier = modifier,
         state = state,
         onLoginTextChange = viewModel::onLoginTextChange,
         onPasswordChange = viewModel::onPasswordChange,
-        onToSignInClick = onHaveAccountClick,
-        onSingInClick = onSingInClick
+        onToSignInClick = onDontHaveAccountClick,
+        onSignInClick = viewModel::onSignInClick,
+        snackbarHostState = snackbarHostState
     )
 }
 @Composable
@@ -68,14 +83,13 @@ fun AuthorisationScreen(
     state: AuthorisationUiState = AuthorisationUiState(),
     onLoginTextChange: (String) -> Unit = {},
     onPasswordChange: (String) -> Unit = {},
-    onConfirmPasswordChange: (String) -> Unit = {},
-    onSingInClick: () -> Unit = {},
-    onToSignInClick: () -> Unit = {}
+    onSignInClick: () -> Unit = {},
+    onToSignInClick: () -> Unit = {},
+    snackbarHostState: SnackbarHostState
 ){
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
     ){
         Column(
             modifier = Modifier
@@ -119,7 +133,8 @@ fun AuthorisationScreen(
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
                     .height(56.dp),
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline,
+                placeholder = stringResource(Res.string.login_placeholder)
             )
             Spacer(
                 modifier = Modifier.height(10.dp)
@@ -144,7 +159,8 @@ fun AuthorisationScreen(
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
                     .height(56.dp),
-                color = MaterialTheme.colorScheme.outline
+                color = MaterialTheme.colorScheme.outline,
+                placeholder = stringResource(Res.string.password_placeholder)
             )
             Spacer(
                 modifier = Modifier.height(10.dp)
@@ -159,7 +175,7 @@ fun AuthorisationScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RoundedButton(
-                onClick = {},
+                onClick = onSignInClick,
                 modifier = Modifier
                     .padding(horizontal = 20.dp),
                 color = MaterialTheme.colorScheme.tertiary,
@@ -197,10 +213,16 @@ fun AuthorisationScreen(
                     ),
                     color = MaterialTheme.colorScheme.onSurface
                 )
-
             }
         }
-
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .imePadding()
+                .padding(16.dp)
+        )
     }
 }
 
@@ -210,9 +232,9 @@ fun AuthorisationScreen(
 fun RegistrationScreenTest(){
     AppTheme {
         Scaffold { paddingValues ->
-            AuthorisationScreen(
-                modifier = Modifier.padding(paddingValues)
-            )
+//            AuthorisationScreen(
+//                modifier = Modifier.padding(paddingValues)
+//            )
         }
     }
 }

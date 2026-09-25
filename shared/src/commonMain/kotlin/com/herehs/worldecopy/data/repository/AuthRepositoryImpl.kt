@@ -12,10 +12,12 @@ class AuthRepositoryImpl(
     private val api: AuthApiService,
     private val tokenStorage: TokenStorage,
 ) : AuthRepository {
+
     override fun login(
         username: String,
         password: String
     ): Flow<Resource<Unit>> = safeApiCall {
+        tokenStorage.clear()
         val response = api.login(username = username, password = password)
         tokenStorage.save(
             WebToken(
@@ -29,6 +31,7 @@ class AuthRepositoryImpl(
         username: String,
         password: String
     ): Flow<Resource<Unit>> = safeApiCall {
+        tokenStorage.clear()
         api.register(username = username, password = password)
         val response = api.login(username = username, password = password)
         tokenStorage.save(

@@ -11,7 +11,7 @@ class SignInUseCase(
         username: String,
         password: String
     ): Flow<Resource<Unit>>{
-        return authRepository.register(
+        return authRepository.login(
             username = username,
             password = password
         )

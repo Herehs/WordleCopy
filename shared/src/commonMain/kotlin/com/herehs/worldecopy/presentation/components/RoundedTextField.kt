@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,22 +34,28 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun RoundedTextField(
     value: String = "",
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.surface,
-    textStyle: TextStyle = TextStyle.Default
+    textStyle: TextStyle = TextStyle.Default,
+    placeholder: String = "",
+    placeholderColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
+    val showPlaceholder = value.isEmpty()
     Box(
         modifier = Modifier,
         contentAlignment = Alignment.Center
     ){
         BasicTextField(
-            value = value,
+            value =  value,
             onValueChange = onValueChange,
             modifier = modifier,
             maxLines = 1,
             singleLine = true,
-            textStyle = textStyle,
+            textStyle = textStyle.copy(
+                color = textColor
+            ),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier
@@ -60,6 +67,14 @@ fun RoundedTextField(
                         .padding(10.dp),
                     contentAlignment = Alignment.CenterStart
                 ){
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            style = textStyle.copy(
+                                color = placeholderColor
+                            )
+                        )
+                    }
                     innerTextField()
                 }
             }
