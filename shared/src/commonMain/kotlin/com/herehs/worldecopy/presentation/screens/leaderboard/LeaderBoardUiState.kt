@@ -1,10 +1,10 @@
 package com.herehs.worldecopy.presentation.screens.leaderboard
 
-import androidx.compose.material3.FabPosition
 import com.herehs.worldecopy.domain.model.LeaderboardItem
 
 data class LeaderBoardUiState(
     val leaderboard: List<LeaderBoardComponentState> = emptyList(),
+    val isRefreshing: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null
 )

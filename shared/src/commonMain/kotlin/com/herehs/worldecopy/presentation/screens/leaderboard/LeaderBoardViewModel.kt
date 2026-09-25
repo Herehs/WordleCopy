@@ -17,13 +17,20 @@ class LeaderBoardViewModel(
     private val _state = MutableStateFlow(LeaderBoardUiState())
     val state = _state.asStateFlow()
 
+    fun onRefresh(){
+        _state.update {
+            it.copy(isRefreshing = true)
+        }
+        updateLeaderboard()
+    }
+
     fun updateLeaderboard(){
         viewModelScope.launch {
             leaderboardUseCase(100).collect { result ->
                 when(result) {
                     is Resource.Error<List<LeaderboardItem>> -> {
                         _state.update { state ->
-                            state.copy(isLoading = false, error = result.message)
+                            state.copy(isLoading = false, error = result.message, isRefreshing = false)
                         }
                     }
                     is Resource.Loading<List<LeaderboardItem>> -> {
@@ -36,7 +43,8 @@ class LeaderBoardViewModel(
                             state.copy(
                                 isLoading = false,
                                 error = null,
-                                leaderboard = result.data?.toUiState() ?: emptyList()
+                                leaderboard = result.data?.toUiState() ?: emptyList(),
+                                isRefreshing = false
                             )
                         }
                     }

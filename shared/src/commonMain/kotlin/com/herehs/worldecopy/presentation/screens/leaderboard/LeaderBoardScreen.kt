@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,7 +53,8 @@ fun LeaderBoardRoute(
     LeaderboardScreen(
         modifier = modifier,
         toMainScreen = toMainScreen,
-        state = state
+        state = state,
+        onRefresh = viewModel::onRefresh
     )
 }
 
@@ -61,47 +63,54 @@ fun LeaderboardScreen(
     modifier: Modifier = Modifier,
     state: LeaderBoardUiState = LeaderBoardUiState(),
     toMainScreen: () -> Unit = {},
+    onRefresh: () -> Unit
 ){
 
     Box(
         modifier = modifier
             .fillMaxSize()
     ){
-        LazyColumn(
-            modifier
-                .fillMaxSize()
-                .align(Alignment.TopCenter)
-                .padding(horizontal = 10.dp)
-        ) {
-            itemsIndexed(state.leaderboard){ index, item ->
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 2.dp)
-                        .clip(shape = RoundedCornerShape(10.dp))
-                        .background(
-                            color = MaterialTheme.colorScheme.surface
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = onRefresh
+        ){
+            LazyColumn(
+                modifier
+                    .fillMaxSize()
+                    .align(Alignment.TopCenter)
+                    .padding(horizontal = 10.dp)
+            ) {
+                itemsIndexed(state.leaderboard){ index, item ->
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 2.dp)
+                            .clip(shape = RoundedCornerShape(10.dp))
+                            .background(
+                                color = MaterialTheme.colorScheme.surface
+                            )
+                            .height(56.dp)
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "$index. ${item.name}",
+                            fontSize = 18.sp,
+                            fontFamily = golosFontFamily(),
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                        .height(56.dp)
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "$index. ${item.name}",
-                        fontSize = 18.sp,
-                        fontFamily = golosFontFamily(),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
 
-                    Text(
-                        text = "${item.points}",
-                        fontSize = 18.sp,
-                        fontFamily = golosFontFamily(),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                        Text(
+                            text = "${item.points}",
+                            fontSize = 18.sp,
+                            fontFamily = golosFontFamily(),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
+
         }
         Column(
             modifier = Modifier
