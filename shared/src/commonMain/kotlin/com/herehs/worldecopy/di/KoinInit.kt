@@ -2,6 +2,7 @@ package com.herehs.blackhxle.di
 
 import com.herehs.worldecopy.di.dataModule
 import com.herehs.worldecopy.di.domainModule
+import com.herehs.worldecopy.di.platformModule
 import com.herehs.worldecopy.di.presentationModule
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin

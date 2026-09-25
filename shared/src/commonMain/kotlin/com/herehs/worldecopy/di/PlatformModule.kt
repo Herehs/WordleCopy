@@ -1,4 +1,4 @@
-package com.herehs.blackhxle.di
+package com.herehs.worldecopy.di
 
 import org.koin.core.module.Module
 

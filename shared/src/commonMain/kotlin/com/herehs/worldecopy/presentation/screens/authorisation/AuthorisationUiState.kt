@@ -9,3 +9,4 @@ data class AuthorisationUiState(
     val canSubmit: Boolean
         get() = login.isNotEmpty() && password.isNotEmpty()
 }
+

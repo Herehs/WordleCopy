@@ -3,18 +3,26 @@ package com.herehs.worldecopy.presentation.screens.leaderboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,22 +30,40 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.herehs.worldecopy.Res
 import com.herehs.worldecopy.presentation.components.RoundedButton
+import com.herehs.worldecopy.presentation.screens.authorisation.AuthorisationViewModel
 import com.herehs.worldecopy.presentation.theme.AppTheme
 import com.herehs.worldecopy.presentation.theme.golosFontFamily
 import com.herehs.worldecopy.start_game
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun LeaderBoardRoute(
     modifier: Modifier = Modifier,
-    toMainScreen: () -> Unit = {}
+    toMainScreen: () -> Unit = {},
+    viewModel: LeaderBoardViewModel = koinViewModel()
 ){
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit){
+        viewModel.events.collect { event ->
+            when(event){
+                is LeaderBoardViewModel.AuthEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
+                else -> {}
+            }
+        }
+    }
+
     LeaderboardScreen(
         modifier = modifier,
-        toMainScreen = toMainScreen
+        toMainScreen = toMainScreen,
+        state = state,
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -45,7 +71,8 @@ fun LeaderBoardRoute(
 fun LeaderboardScreen(
     modifier: Modifier = Modifier,
     state: LeaderBoardUiState = LeaderBoardUiState(),
-    toMainScreen: () -> Unit = {}
+    toMainScreen: () -> Unit = {},
+    snackbarHostState: SnackbarHostState
 ){
 
     Box(
@@ -89,7 +116,7 @@ fun LeaderboardScreen(
             }
         }
 
-        Box(
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .clip(
@@ -102,8 +129,14 @@ fun LeaderboardScreen(
                     color = MaterialTheme.colorScheme.surface
                 )
                 .fillMaxWidth(),
-            contentAlignment = Alignment.Center
         ){
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .imePadding()
+                    .padding(16.dp)
+            )
+
             RoundedButton(
                 modifier = Modifier
                     .padding(10.dp),
@@ -134,10 +167,10 @@ fun LeaderboardScreenPreview(){
             )
         }
         Scaffold { paddingValues ->
-            LeaderboardScreen(
-                modifier = Modifier.padding(paddingValues),
-                state = LeaderBoardUiState(leaderboard = leaderboard)
-            )
+//            LeaderboardScreen(
+//                modifier = Modifier.padding(paddingValues),
+//                state = LeaderBoardUiState(leaderboard = leaderboard)
+//            )
         }
     }
 }
