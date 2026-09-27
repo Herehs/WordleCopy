@@ -165,7 +165,8 @@ fun RegistrationScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 color = MaterialTheme.colorScheme.outline,
-                placeholder = stringResource(Res.string.password_placeholder)
+                placeholder = stringResource(Res.string.password_placeholder),
+                isPassword = true
             )
             Spacer(
                 modifier = Modifier.height(10.dp)
@@ -190,7 +191,8 @@ fun RegistrationScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 color = MaterialTheme.colorScheme.outline,
-                placeholder = stringResource(Res.string.confirm_password_placeholder)
+                placeholder = stringResource(Res.string.confirm_password_placeholder),
+                isPassword = true
             )
         }
         //sing-in button

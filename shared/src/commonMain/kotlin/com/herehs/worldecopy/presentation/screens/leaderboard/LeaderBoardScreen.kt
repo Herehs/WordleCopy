@@ -1,5 +1,9 @@
 package com.herehs.worldecopy.presentation.screens.leaderboard
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -35,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.herehs.worldecopy.Res
 import com.herehs.worldecopy.presentation.components.RoundedButton
 import com.herehs.worldecopy.presentation.screens.authorisation.AuthorisationViewModel
+import com.herehs.worldecopy.presentation.screens.main.MainScreen
 import com.herehs.worldecopy.presentation.theme.AppTheme
 import com.herehs.worldecopy.presentation.theme.golosFontFamily
 import com.herehs.worldecopy.start_game
@@ -58,6 +65,7 @@ fun LeaderBoardRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LeaderboardScreen(
     modifier: Modifier = Modifier,
@@ -70,48 +78,74 @@ fun LeaderboardScreen(
         modifier = modifier
             .fillMaxSize()
     ){
-        PullToRefreshBox(
-            isRefreshing = state.isRefreshing,
-            onRefresh = onRefresh
+        AnimatedVisibility(
+            visible = state.isLoading,
+            enter = fadeIn(
+                tween(400)
+            ),
+            exit = fadeOut(tween(400))
         ){
-            LazyColumn(
-                modifier
-                    .fillMaxSize()
-                    .align(Alignment.TopCenter)
-                    .padding(horizontal = 10.dp)
-            ) {
-                itemsIndexed(state.leaderboard){ index, item ->
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 2.dp)
-                            .clip(shape = RoundedCornerShape(10.dp))
-                            .background(
-                                color = MaterialTheme.colorScheme.surface
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
+                LoadingIndicator(
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = !state.isLoading,
+            enter = fadeIn(
+                tween(400)
+            ),
+            exit = fadeOut(tween(400))
+        ){
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = onRefresh
+            ){
+                LazyColumn(
+                    modifier
+                        .fillMaxSize()
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 10.dp)
+                ) {
+                    itemsIndexed(state.leaderboard){ index, item ->
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .clip(shape = RoundedCornerShape(10.dp))
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface
+                                )
+                                .height(56.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "${index + 1}. ${item.name}",
+                                fontSize = 18.sp,
+                                fontFamily = golosFontFamily(),
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                            .height(56.dp)
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "$index. ${item.name}",
-                            fontSize = 18.sp,
-                            fontFamily = golosFontFamily(),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
 
-                        Text(
-                            text = "${item.points}",
-                            fontSize = 18.sp,
-                            fontFamily = golosFontFamily(),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                            Text(
+                                text = "${item.points}",
+                                fontSize = 18.sp,
+                                fontFamily = golosFontFamily(),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
-            }
 
+            }
         }
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

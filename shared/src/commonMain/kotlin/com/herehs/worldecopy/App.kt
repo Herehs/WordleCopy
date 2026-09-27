@@ -17,15 +17,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreOwner
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.herehs.worldecopy.presentation.navigation.Screen
 import com.herehs.worldecopy.presentation.screens.authorisation.AuthorisationScreenRoute
 import com.herehs.worldecopy.presentation.screens.leaderboard.LeaderBoardRoute
 import com.herehs.worldecopy.presentation.screens.main.MainScreenRoute
+import com.herehs.worldecopy.presentation.screens.main.MainScreenViewModel
 import com.herehs.worldecopy.presentation.screens.registration.RegistrationScreenRoute
 import com.herehs.worldecopy.presentation.theme.AppTheme
 import kotlinx.serialization.modules.SerializersModule
@@ -69,6 +73,10 @@ fun NavRoot(
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
         entryProvider = entryProvider {
             entry<Screen.Registration> {
                 RegistrationScreenRoute(
@@ -108,15 +116,26 @@ fun NavRoot(
                 LeaderBoardRoute(
                     modifier = Modifier.systemBarsPadding(),
                     toMainScreen = {
-                        backStack.add(Screen.Main)
-
+                        val below = backStack.getOrNull(backStack.lastIndex - 1)
+                        if (below is Screen.Main) {
+                            backStack.removeLastOrNull()
+                        } else {
+                            backStack.removeLastOrNull()
+                            backStack.add(Screen.Main)
+                        }
                     }
                 )
             }
             entry<Screen.Main> {
+                val mainViewModel: MainScreenViewModel = koinViewModel()
                 MainScreenRoute(
                     modifier = Modifier.systemBarsPadding(),
+                    viewModel = mainViewModel,
                     toLeaderBoard = {
+                        backStack.add(Screen.Leaderboard)
+                    },
+                    onFinishClick = {
+                        backStack.removeAll { it is Screen.Main }
                         backStack.add(Screen.Leaderboard)
                     }
                 )

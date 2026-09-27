@@ -6,6 +6,10 @@ import com.herehs.worldecopy.presentation.screens.main.components.WordGridState
 data class MainScreenUiState(
     val keyState: Map<Char, LetterState> = emptyMap(),
     val gridState: WordGridState = WordGridState(),
+    val won: Boolean = false,
+    val ended: Boolean = false,
+    val gameId: Int = 0,
+    val score: Int? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
