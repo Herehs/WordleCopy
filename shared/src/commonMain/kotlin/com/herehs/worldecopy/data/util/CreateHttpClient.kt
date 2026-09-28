@@ -2,6 +2,7 @@ package com.herehs.worldecopy.data.util
 
 import com.herehs.worldecopy.core.common.BASE_URL
 import com.herehs.worldecopy.data.local.token_storage.TokenStorage
+import com.herehs.worldecopy.data.local.token_storage.dto.WebToken
 import com.herehs.worldecopy.data.util.dto.RefreshRequest
 import com.herehs.worldecopy.data.util.dto.RefreshTokenDto
 import com.herehs.worldecopy.data.util.dto.toWebToken
@@ -73,12 +74,13 @@ fun createApiClient(
                     return@refreshTokens null
                 }
 
-                val dto = response.body<RefreshTokenDto>().toWebToken()
+                val dto = response.body<String>()
 
-                storage.save(token = dto)
+                storage.updateAccess(token = dto)
+
                 BearerTokens(
-                    accessToken = dto.access,
-                    refreshToken = dto.refresh
+                    accessToken = dto,
+                    refreshToken = old.refresh
                 )
             }
 
