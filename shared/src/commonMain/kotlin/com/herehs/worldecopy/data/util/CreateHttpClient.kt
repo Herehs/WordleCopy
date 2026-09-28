@@ -2,7 +2,6 @@ package com.herehs.worldecopy.data.util
 
 import com.herehs.worldecopy.core.common.BASE_URL
 import com.herehs.worldecopy.data.local.token_storage.TokenStorage
-import com.herehs.worldecopy.data.local.token_storage.dto.WebToken
 import com.herehs.worldecopy.data.util.dto.RefreshRequest
 import com.herehs.worldecopy.data.util.dto.RefreshTokenDto
 import com.herehs.worldecopy.data.util.dto.toWebToken
@@ -23,8 +22,6 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.serialization.json.Json
-
-
 
 
 fun HttpClientConfig<*>.commonConfig() {
